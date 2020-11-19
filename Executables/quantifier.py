@@ -4,17 +4,27 @@ Created on Wed Nov 18 09:12:51 2020
 
 @author: holtj
 
-**This needs to be an executable by Friday**
+**This is going on discovery Friday**
 
 This executable script downloads data, feeds it into Salmon using the correct 
 parameters, and deletes downloaded data after Salmon is finished.
-Takes in a list of SRR#s as strings from the init.py as an input.
+Input should be: python quantifier.py -l "SRX,SRR,SRR,SRR"
 """
 
 import os
 import glob
 import pandas as pd
 import numpy as np
+import argparse
+"""
+Using arparse to take in command line arguments
+"""
+parser = argparse.ArgumentParser()
+parser.add_argument('-l', '--list', help='delimited list input', type=str)
+args = parser.parse_args()
+input_lis = [int(item) for item in args.list.split(',')]
+
+
 """
 Directories
 this should be an input tbh
@@ -41,7 +51,6 @@ This is the heart of the project. So ugly.
 """
 
 #dummy variables until command line input is setup
-input_lis=['SRX','SRR','SRR']
 w = input_lis[0]
 
 for y in glob.glob('INDEX_'+ref_folder+'/*'):

@@ -35,9 +35,9 @@ Create dictionary
 #read in SRR#s from metadata table provided by Georgia
 sra_run_table = pd.read_csv(r'SraRunTable.csv', sep=",", header=0, index_col=0)
 #print(sra_run_table['Run'][3:7])
-
 #create a dict key of biosamples : srr numbers(could do SRX:SRR instead)
 bio_sample_dic = sra_run_table.groupby('BioSample').agg({'Run':lambda x:x.tolist()})['Run'].to_dict()
+
 """
 Call the indexer executable
 """
@@ -46,7 +46,9 @@ Call the indexer executable
 Start submitting jobs using exec #2
 """
 for i in bio_sample_dic.keys():
-    #qsub executable2(bio_Sample_dic[i])
+    #build string input for quantifier.py
+    #write pbs file
+    #qsub pbs ???
     print(i)
     
 """
