@@ -4,7 +4,8 @@ Created on Wed Nov 18 12:48:25 2020
 
 @author: holtj
 
-This executable script creates a csv file from the Salmon outputs. 
+This executable script creates a csv file from the Salmon outputs.
+This is a copy of Alex's code, but using os and glob. 
 """
 
 import os
