@@ -22,7 +22,6 @@ ref_folder = 'references'
 data = 'data'
 #csv output folder name
 csv = 'Ex'
-
 """
 Silly function
 """
@@ -33,10 +32,14 @@ def grab_ref(ref_folder1):
     return(files)
 
 """
-Build CSV
-
-need to write the function that gets a list of index names
+Build CSV for each index
 """
+
+index_names =[] #will use this later
+for y in glob.glob('INDEX_'+ref_folder+'/*'):
+    index_name = y.replace('INDEX_references/','').replace('.ffn.gz','')
+    print('Index: '+index_name)
+    index_names.append(index_name)
 #loop through indexes and build dataframe of output for each one
 df_list = []
 for i in index_names: 

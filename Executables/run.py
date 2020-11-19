@@ -52,7 +52,3 @@ for i in bio_sample_dic.keys():
 """
 Call the csv_builder executable
 """
-
-"""
-Call the differentiale gene expression analysis executable
-"""
