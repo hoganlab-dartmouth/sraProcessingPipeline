@@ -4,7 +4,7 @@ Created on Wed Nov 18 12:44:29 2020
 
 @author: holtj
 
-This executable is the pipeline management. It calls the others and submits jobs. 
+This executable is the pipeline management. It submits the jobs. 
 """
 
 import os
@@ -18,7 +18,9 @@ import wget
 """
 Make sure Salmon and SRAToolkit are installed and configured properly
 Copied Alex's code, with some modifications, for this.
-Not really sure if it works yet
+Not really sure if it works yet. 
+
+Will probably end up just doing this manually before calling scripts. 
 """
 # Download latest version of compiled binaries of NCBI SRA toolkit 
 if not os.path.exists("sratoolkit.current-centos_linux64.tar.gz"):
@@ -55,12 +57,13 @@ sra_run_table = pd.read_csv(r'SraRunTable.csv', sep=",", header=0, index_col=0)
 bio_sample_dic = sra_run_table.groupby('BioSample').agg({'Run':lambda x:x.tolist()})['Run'].to_dict()
 
 """
-Call the indexer executable
+Submit indexer job
+For now, this is done on personal computer and indexes are copied over. 
 """
-#os.system('python indexer.py')
 
 """
 Start submitting jobs that call quantifier
+this is what we will test first
 """
 for i in bio_sample_dic.keys()[600:601]:
     # Open a pipe to the qsub command.
@@ -73,12 +76,19 @@ for i in bio_sample_dic.keys()[600:601]:
     command = "python quantifier.py -l "+i+","+bio_sample_dic[i]
 
     job_string = """#!/bin/bash
+    #PBS -q testq
     #PBS -N %s
     #PBS -l walltime=%s
     #PBS -l %s
+    #PBS -m bea
+    #PBS -M jacob.d.holt.gr@dartmouth.edu
     #PBS -o ./output/%s.out
     #PBS -e ./error/%s.err
     cd $PBS_O_WORKDIR
+    
+    module load sratoolkit
+    
+    module load Salmon
     %s""" % (job_name, walltime, processors, job_name, job_name, command)
     
     # Send job_string to qsub
@@ -93,7 +103,8 @@ for i in bio_sample_dic.keys()[600:601]:
     print(out)
     
     time.sleep(0.1)
+    
 """
-Call the csv_builder executable
+Submit csv builder job
+for now, data is copied to personal computer and this is run there
 """
-os.system('python csv_builder.py')

@@ -4,20 +4,37 @@ Created on Wed Nov 18 09:12:51 2020
 
 @author: holtj
 
-**This is going on discovery Friday**
+This script downloads data, feeds it into Salmon using the correct 
+parameters and deletes downloaded data after Salmon is finished.
+To do this, it calls SRAToolkit fastq-dump and Salmon quant. os.system() is used
+to call this and other command line functions. 
 
-This executable script downloads data, feeds it into Salmon using the correct 
-parameters, and deletes downloaded data after Salmon is finished.
-Input should be: python quantifier.py -l "SRX,SRR,SRR,SRR"
+Command line input when calling this script should be: 
+python quantifier.py -l "SRX,SRR,SRR,SRR"
+
+I would like to freeze this script as an executable to get around having to add 
+the libraries to Discovery. 
+
+The paths on discovery might mess this up. On Discovery we want to use 
+/global/scratch.
+
 """
 
+#os is used for command line interface
 import os
+#glob is used to find files by name
 import glob
-import pandas as pd
+#numpy is used to iterate through lists. Could probably rewrite to not use numpy
 import numpy as np
+#argparse is used for comman line input 
 import argparse
+
+
 """
 Using arparse to take in command line arguments
+
+Command line input when calling this script should be: 
+python quantifier.py -l "SRX,SRR,SRR,SRR"
 """
 parser = argparse.ArgumentParser()
 parser.add_argument('-l', '--list', help='delimited list input', type=str)
@@ -27,7 +44,10 @@ input_lis = [int(item) for item in args.list.split(',')]
 
 """
 Directories
-this should be an input tbh
+
+Tells the script which folder your references, data, and outputs are stored in.
+
+This should probably be an input? It's used in every script. 
 """
 #ref folder name, ref genomes go here
 ref_folder = 'references'
@@ -37,16 +57,17 @@ data = 'data'
 csv = 'Ex'
 
 """
-Silly function. Shouldn't even have this.'
+Silly function. Should rewrite to not have this. 
 """
-#grabs stuff and returns a list of them-used throughout
+#grabs stuff and returns a list of them. This is used throughout scripts.
 def grab_ref(ref_folder1):
     files=glob.glob(ref_folder1+'/*')
-    #print(files)
     return(files)
 
 """
-Quants
+Download data using fastq-dump, quantifies data using Salmon, and deletes 
+downloaded data. 
+
 This is the heart of the project. So ugly. 
 """
 
@@ -72,7 +93,7 @@ for y in glob.glob('INDEX_'+ref_folder+'/*'):
         elif len(grab_ref(run_folders[0]))==1:
             print('One run for ')
             print('Salmon input: '+grab_ref(run_folders[0])[0])
-            #os.system('salmon quant -i '+y+' -l A '+grab_ref(run_folders[0])[0]+' -p 8 --validateMappings -o '+output_name)
+            os.system('salmon quant -i '+y+' -l A '+grab_ref(run_folders[0])[0]+' -p 8 --validateMappings -o '+output_name)
         elif len(grab_ref(run_folders[0]))>1:
             runs = grab_ref(run_folders[0])
             print('Multiple runs for ')
@@ -104,7 +125,7 @@ for y in glob.glob('INDEX_'+ref_folder+'/*'):
                 print('One run for '+run_folder)
                 print('Salmon input: '+grab_ref(run_folder)[0])
                 orphan_read += ' '+grab_ref(run_folder)[0]
-                #os.system('salmon quant -i '+y+' -l A '+grab_ref(run_folders[0])[0]+' -p 8 --validateMappings -o '+output_name)
+                os.system('salmon quant -i '+y+' -l A '+grab_ref(run_folders[0])[0]+' -p 8 --validateMappings -o '+output_name)
             elif len(grab_ref(run_folder))>1:
                 print('Multiple runs for '+run_folder)
                 runs=grab_ref(run_folder)
@@ -128,5 +149,5 @@ for y in glob.glob('INDEX_'+ref_folder+'/*'):
         elif len(orphan_read) == 2:
             input_name = '-1'+first_read_str+' -2'+second_read_str
         print('Salmon Input: '+input_name)
-        #os.system('salmon quant -i '+y+' -l A '+input_name+' -p 8 --validateMappings -o '+output_name)
-        #os.system('rm -r data/'+w)
+        os.system('salmon quant -i '+y+' -l A '+input_name+' -p 8 --validateMappings -o '+output_name)
+        os.system('rm -r data/'+w)

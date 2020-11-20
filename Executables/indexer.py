@@ -22,19 +22,20 @@ ref_folder = 'references'
 data = 'data'
 #csv output folder name
 csv = 'Ex'
-
 """
-Build the indexes
+Silly function
+should get rid of this
 """
-#grabs stuff and returns a list of them-used throughout
 def grab_ref(ref_folder1):
     files=glob.glob(ref_folder1+'/*')
     #print(files)
     return(files)
-
+"""
+Build the indexes
+"""
 #builds Salmon index from given file names, puts indexes into folder, INDEX_references 
 def salmon_index(genome):
-    #os.system('salmon index -t '+str(genome)+' -i INDEX_'+str(genome))
+    os.system('salmon index -t '+str(genome)+' -i INDEX_'+str(genome))
     #print('salmon '+ genome)
     return 
 
