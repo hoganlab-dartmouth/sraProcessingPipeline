@@ -4,6 +4,8 @@ Created on Wed Nov 18 09:12:51 2020
 
 @author: holtj
 
+This quantifier script handles combining replicates using SRX of BioSample number. 
+
 This script downloads data, feeds it into Salmon using the correct 
 parameters and deletes downloaded data after Salmon is finished.
 To do this, it calls SRAToolkit fastq-dump and Salmon quant. os.system() is used
@@ -16,8 +18,7 @@ I would like to freeze this script as an executable to get around having to add
 the libraries to Discovery. 
 
 The paths on discovery might mess this up. On Discovery we want to use 
-/global/scratch.
-
+/global/scratch since we are cleaning things up after. 
 """
 
 #os is used for command line interface
@@ -71,9 +72,7 @@ downloaded data.
 This is the heart of the project. So ugly. 
 """
 
-#dummy variables until command line input is setup
-w = input_lis[0]
-
+w=input_lis[0]
 for y in glob.glob('INDEX_'+ref_folder+'/*'):
     index_name = y.replace('INDEX_references/','').replace('.ffn.gz','')
     print('Index: '+index_name)

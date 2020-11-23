@@ -4,7 +4,12 @@ Created on Wed Nov 18 12:44:29 2020
 
 @author: holtj
 
-This executable is the pipeline management. It submits the jobs. 
+This executable is the pipeline management. It submits the jobs for each script
+that we want to call. There are three python scripts: indexer, quantifier, and csv_builder
+
+I am not sure how to make sure the jobs happen in the right order. 
+
+I think the directories are not correct as well. 
 """
 
 import os
@@ -58,12 +63,11 @@ bio_sample_dic = sra_run_table.groupby('BioSample').agg({'Run':lambda x:x.tolist
 
 """
 Submit indexer job
-For now, this is done on personal computer and indexes are copied over. 
+This call creates the Salmon index files. 
 """
 
 """
-Start submitting jobs that call quantifier
-this is what we will test first
+Start submitting jobs that call quantifier script.
 """
 for i in bio_sample_dic.keys()[600:601]:
     # Open a pipe to the qsub command.
@@ -106,5 +110,5 @@ for i in bio_sample_dic.keys()[600:601]:
     
 """
 Submit csv builder job
-for now, data is copied to personal computer and this is run there
+This call creates the csv files of samples x genes counts
 """
