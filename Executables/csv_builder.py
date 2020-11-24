@@ -17,11 +17,11 @@ Directories
 this should be an input tbh
 """
 #ref folder name, ref genomes go here
-ref_folder = 'references'
+ref_folder = '/dartfs-hpc/scratch/Jake/references'
 #data folder name, samples and runs go here
-data = 'data'
+data = '/dartfs-hpc/scratch/Jake/data'
 #csv output folder name
-csv = 'Ex'
+csv = '/dartfs-hpc/scratch/Jake/Ex'
 """
 Silly function
 should get rid of this

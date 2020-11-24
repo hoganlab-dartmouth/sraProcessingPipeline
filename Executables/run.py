@@ -9,7 +9,10 @@ that we want to call. There are three python scripts: indexer, quantifier, and c
 
 I am not sure how to make sure the jobs happen in the right order. 
 
-I think the directories are not correct as well. 
+As of 11/24, the best way to run this is to do the indexing locally and setup 
+the directories with the right files on Discovery. Then you can start writing an submitting jobs using this run file.
+Once your jobs are done, you then move the Ex folder to your local machine and run the csv_builder.  Eventually I'd like
+for everything to be run on discovery, but for testing this should be fine. 
 """
 
 import os
@@ -41,15 +44,16 @@ if os.path.exists("sratoolkit.current-centos_linux64.tar.gz"):
 
 """
 Setup directories
+These really should be input options
 """
 #ref folder name, ref genomes go here
-ref_folder = 'references'
+ref_folder = '/dartfs-hpc/scratch/Jake/references'
 #os.system('mkdir '+ref_folder)
 #data folder name, samples and runs go here
-data = 'data'
+data = '/dartfs-hpc/scratch/Jake/data'
 #os.system('mkdir '+data)
 #csv output folder name
-csv = 'Ex'
+csv = '/dartfs-hpc/scratch/Jake/Ex'
 #os.system('mkdir '+csv)
 
 """
@@ -80,14 +84,17 @@ for i in bio_sample_dic.keys()[600:601]:
     command = "python quantifier.py -l "+i+","+bio_sample_dic[i]
 
     job_string = """#!/bin/bash
-    #PBS -q testq
+    #PBS -q tyestq
+    #PBS -A NCCC
     #PBS -N %s
     #PBS -l walltime=%s
     #PBS -l %s
+    #PBS -l feature='cellf'
     #PBS -m bea
     #PBS -M jacob.d.holt.gr@dartmouth.edu
     #PBS -o ./output/%s.out
     #PBS -e ./error/%s.err
+    
     cd $PBS_O_WORKDIR
     
     module load sratoolkit

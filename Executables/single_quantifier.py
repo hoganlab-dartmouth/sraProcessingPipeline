@@ -4,7 +4,7 @@ Created on Mon Nov 23 08:34:36 2020
 
 @author: holtj
 
-The directories are probbaly a little messed up still. 
+The directories are probbaly a little messed up for running on Discovery. 
 
 This single_quantifier script handles the single SRR number per SRX/BioSample# case. 
 Use the other one if you want to combine samples. 
@@ -49,11 +49,11 @@ Tells the script which folder your references, data, and outputs are stored in.
 This should probably be an input? It's used in every script. 
 """
 #ref folder name, ref genomes go here
-ref_folder = 'references'
+ref_folder = '/dartfs-hpc/scratch/Jake/references'
 #data folder name, samples and runs go here
-data = 'data'
+data = '/dartfs-hpc/scratch/Jake/data'
 #csv output folder name
-csv = 'Ex'
+csv = '/dartfs-hpc/scratch/Jake/Ex'
 """
 Silly function. Should rewrite to not use this. 
 """
