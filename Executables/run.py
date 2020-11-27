@@ -13,12 +13,16 @@ As of 11/24, the best way to run this is to do the indexing locally and setup
 the directories with the right files on Discovery. Then you can start writing an submitting jobs using this run file.
 Once your jobs are done, you then move the Ex folder to your local machine and run the csv_builder.  Eventually I'd like
 for everything to be run on discovery, but for testing this should be fine. 
+
+Home directory: 
+DartFS: /dartfs-hpc/rc/home/e/d12345e (50GB)
+
+/scratch is local to nodes. Job data can be stored here but should be deleted. 
 """
 
 import os
 import glob
 import pandas as pd
-import numpy as np
 from subprocess import Popen, PIPE
 import time
 import wget
@@ -61,7 +65,6 @@ Create dictionary
 """
 #read in SRR#s from metadata table provided by Georgia
 sra_run_table = pd.read_csv(r'SraRunTable.csv', sep=",", header=0, index_col=0)
-#print(sra_run_table['Run'][3:7])
 #create a dict key of biosamples : srr numbers(could do SRX:SRR instead)
 bio_sample_dic = sra_run_table.groupby('BioSample').agg({'Run':lambda x:x.tolist()})['Run'].to_dict()
 

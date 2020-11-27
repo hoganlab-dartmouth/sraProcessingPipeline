@@ -23,6 +23,7 @@ the libraries to Discovery.
 The paths on discovery might mess this up. On Discovery we want to use 
 /global/scratch since we are cleaning things up after. 
 """
+
 #os is used for command line interface
 import os
 #glob is used to find files by name
@@ -31,6 +32,7 @@ import glob
 import numpy as np
 #argparse is used for comman line input 
 import argparse
+
 """
 Using arparse to take in command line arguments
 
@@ -41,6 +43,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-l', '--list', help='delimited list input', type=str)
 args = parser.parse_args()
 input_lis = [int(item) for item in args.list.split(',')]
+
 """
 Directories
 
@@ -54,6 +57,7 @@ ref_folder = '/dartfs-hpc/scratch/Jake/references'
 data = '/dartfs-hpc/scratch/Jake/data'
 #csv output folder name
 csv = '/dartfs-hpc/scratch/Jake/Ex'
+
 """
 Silly function. Should rewrite to not use this. 
 """
@@ -61,6 +65,7 @@ Silly function. Should rewrite to not use this.
 def grab_ref(ref_folder1):
     files=glob.glob(ref_folder1+'/*')
     return(files)
+
 """
 Downloads data using fastq-dump, quantifies data using Salmon, and deletes 
 downloaded data. 
