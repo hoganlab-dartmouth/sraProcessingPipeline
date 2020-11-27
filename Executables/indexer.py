@@ -15,11 +15,7 @@ Directories
 this should be an input tbh
 """
 #ref folder name, ref genomes go here
-ref_folder = '/dartfs-hpc/scratf004ky5ch/Jake/references'
-#data folder name, samples and runs go here
-data = '/dartfs-hpc/scratch/Jake/data'
-#csv output folder name
-csv = '/dartfs-hpc/scratch/Jake/Ex'
+ref_folder = '~/sraProcessingPipeline/References'
 
 """
 Silly function
