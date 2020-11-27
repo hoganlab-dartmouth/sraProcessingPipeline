@@ -7,13 +7,15 @@ Created on Wed Nov 18 12:48:25 2020
 This executable script creates a csv file from the Salmon outputs.
 """
 
-import os
+#We're using glob to grab filenames. I know this isn't ideal. 
 import glob
+#Pandas is used to write to csv. It was easy this way. 
 import pandas as pd
 
 """
-Directories
-this should be an input tbh
+Directories used by the program. 
+This should be an input tbh.
+Also should probably not do scratch. 
 """
 #ref folder name, ref genomes go here
 ref_folder = '/dartfs-hpc/scratch/Jake/references'
@@ -23,8 +25,8 @@ data = '/dartfs-hpc/scratch/Jake/data'
 csv = '/dartfs-hpc/scratch/Jake/Ex'
 
 """
-Silly function
-should get rid of this
+Silly function. Uses glob to rgab file names and then edits the string a lil. 
+I should rewrite so that this is done inline. 
 """
 #grabs stuff and returns a list of them-used throughout
 def grab_ref(ref_folder1):
@@ -40,11 +42,10 @@ It creates a csv file for each index with samples for rows and genes for columns
 index_names =[] 
 for file in glob.glob('INDEX_'+ref_folder+'/*'):
     index_name = file.replace('INDEX_references/','').replace('.ffn.gz','')
-    print('Index: '+index_name)
     index_names.append(index_name)
     
 #loop through the list of index names and build dataframe for each one
-#directory structure is really important
+#directory structure is really important. See powerpoints/journal. 
 df_list = []
 for index in index_names: 
     glob_list = []

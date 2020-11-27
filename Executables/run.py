@@ -20,12 +20,9 @@ DartFS: /dartfs-hpc/rc/home/e/d12345e (50GB)
 /scratch is local to nodes. Job data can be stored here but should be deleted. 
 """
 
-import os
-import glob
 import pandas as pd
 from subprocess import Popen, PIPE
 import time
-import wget
 
 """
 Make sure Salmon and SRAToolkit are installed and configured properly
@@ -35,14 +32,14 @@ Not really sure if it works yet.
 Will probably end up just doing this manually before calling scripts. 
 """
 # Download latest version of compiled binaries of NCBI SRA toolkit 
-if not os.path.exists("sratoolkit.current-centos_linux64.tar.gz"):
-    wget.download("ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-centos_linux64.tar.gz")
+# if not os.path.exists("sratoolkit.current-centos_linux64.tar.gz"):
+#     wget.download("ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-centos_linux64.tar.gz")
 
 
 # Extract tar.gz file 
-if os.path.exists("sratoolkit.current-centos_linux64.tar.gz"):
-    os.system('tar -xzf sratoolkit.current-centos_linux64.tar.gz')
-    os.system('export PATH=$PATH:sratoolkit.2.10.7-centos_linux64/bin')
+# if os.path.exists("sratoolkit.current-centos_linux64.tar.gz"):
+#     os.system('tar -xzf sratoolkit.current-centos_linux64.tar.gz')
+#     os.system('export PATH=$PATH:sratoolkit.2.10.7-centos_linux64/bin')
 
 # Now SRA binaries added to path and ready to use
 
@@ -72,13 +69,53 @@ bio_sample_dic = sra_run_table.groupby('BioSample').agg({'Run':lambda x:x.tolist
 Submit indexer job
 This call creates the Salmon index files. 
 """
+# Open a pipe to the qsub command.
+proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
 
+# Customize your options here
+job_name = "my_job_indexer"
+walltime = "1:00:00"
+processors = "nodes=1:ppn=1"
+command = "python indexer.py"
+
+job_string = """#!/bin/bash
+#PBS -q tyestq
+#PBS -A NCCCsub 
+#PBS -N %s
+#PBS -l walltime=%s
+#PBS -l %s
+#PBS -l feature='cellf'
+#PBS -m bea
+#PBS -M jacob.d.holt.gr@dartmouth.edu
+#PBS -o ./output/%s.out
+#PBS -e ./error/%s.err
+
+cd $PBS_O_WORKDIR
+
+module load Salmon
+%s""" % (job_name, walltime, processors, job_name, job_name, command)
+
+# Send job_string to qsub
+#if (sys.version_info > (3, 0)):
+proc.stdin.write(job_string.encode('utf-8'))
+
+#proc.stdin.write(job_string)
+out, err = proc.communicate()
+
+# Print your job and the system response to the screen as it's submitted
+print(job_string)
+print(out)
+
+time.sleep(0.1)
+    
 """
-Start submitting jobs that call quantifier script.
+Start submitting jobs that call quantifier script once the indexer job is done. 
+
+Should hold job until indexer job is finished. I have no idea if this works though. 
 """
 for i in bio_sample_dic.keys()[600:601]:
     # Open a pipe to the qsub command.
-    proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    proc = Popen('qsub -hold_jid my_job_indexer', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
     
     # Customize your options here
     job_name = "my_job_%d" % i
@@ -88,7 +125,7 @@ for i in bio_sample_dic.keys()[600:601]:
 
     job_string = """#!/bin/bash
     #PBS -q tyestq
-    #PBS -A NCCC
+    #PBS -A NCCCsub 
     #PBS -N %s
     #PBS -l walltime=%s
     #PBS -l %s
@@ -118,7 +155,8 @@ for i in bio_sample_dic.keys()[600:601]:
     
     time.sleep(0.1)
     
+    #something to move quants out of scratch should be here
+    
 """
-Submit csv builder job
-This call creates the csv files of samples x genes counts
+It's easier to run this locally I think? 
 """

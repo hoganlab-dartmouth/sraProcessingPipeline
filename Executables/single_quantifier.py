@@ -72,8 +72,8 @@ downloaded data.
 """
 srx = input_lis[0]
 srr = input_lis[1]
-for y in glob.glob('INDEX_'+ref_folder+'/*'):
-    index_name = y.replace('INDEX_references/','').replace('.ffn.gz','')
+for index in glob.glob('INDEX_'+ref_folder+'/*'):
+    index_name = index.replace('INDEX_references/','').replace('.ffn.gz','')
     print('Index: '+index_name)
     dump_directory = 'data/'+srx+'/'+srr
     os.system('mkdir '+dump_directory)
@@ -92,7 +92,7 @@ for y in glob.glob('INDEX_'+ref_folder+'/*'):
             input_name='-r'
             input_name +=' '+grab_ref(run_folders[0])[0]
             print('Salmon input: '+input_name)
-            os.system('salmon quant -i '+y+' -l A '+input_name+' -p 8 --validateMappings -o '+output_name)
+            os.system('salmon quant -i '+index+' -l A '+input_name+' -p 1 --validateMappings -o '+output_name)
         elif len(grab_ref(run_folders[0]))>1:
             runs = grab_ref(run_folders[0])
             print('Multiple runs for ')
@@ -100,5 +100,5 @@ for y in glob.glob('INDEX_'+ref_folder+'/*'):
             for z in np.arange(0, len(runs)):
                 input_name+= ' '+runs[z]
             print('Salmon Input: '+input_name)
-        os.system('salmon quant -i '+y+' -l A '+input_name+' -p 8 --validateMappings -o '+output_name)
+        os.system('salmon quant -i '+index+' -l A '+input_name+' -p 1 --validateMappings -o '+output_name)
         os.system('rm -r data/'+srx)
