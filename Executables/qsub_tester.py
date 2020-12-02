@@ -18,39 +18,35 @@ This call creates the Salmon index files.
 proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
 
 # Customize your options here
-job_name = "my_job_indexer"
+job_name = "indexer_test"
 walltime = "1:00:00"
 processors = "nodes=1:ppn=1"
-command = "python ~/sraProcessingPipeline/indexer/indexer.py"
+command = "python indexer.py"
 
-job_string = """#!/bin/bash
-#PBS -q testq
-#PBS -A NCCCsub 
-#PBS -N %s
+job_string ="""#!/bin/bash -l
+#PBS -q default
+#PBS -N %s 
 #PBS -l walltime=%s
 #PBS -l %s
-#PBS -l feature='cellf'
+#PBS -l mem=2gb
 #PBS -m bea
 #PBS -M jacob.d.holt.gr@dartmouth.edu
-#PBS -o ./output/%s.out
-#PBS -e ./error/%s.err
+#PBS -l feature='cellk'
 
-cd $PBS_O_WORKDIR
+cd "/dartfs-hpc/rc/home/5/f004ky5/sraProcessingPipeline"
 
-module load Salmon
+module load python/anaconda3
 
+module load salmon
 
-%s""" % (job_name, walltime, processors, job_name, job_name, command)
+%s
+
+exit 0
+
+""" % (job_name, walltime, processors, command)
 
 # Send job_string to qsub
-#if (sys.version_info > (3, 0)):
+
 proc.stdin.write(job_string.encode('utf-8'))
 
-#proc.stdin.write(job_string)
-out, err = proc.communicate()
-
-# Print your job and the system response to the screen as it's submitted
-print(job_string)
-print(out)
-
-time.sleep(0.1)
+print(proc.communicate())
