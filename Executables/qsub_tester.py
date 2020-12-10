@@ -5,6 +5,8 @@ Created on Thu Nov 26 21:05:03 2020
 @author: holtj
 
 To test out python submitting jobs.
+
+Switched to using run_lite pretty quickly. 
 """
 
 from subprocess import Popen, PIPE
@@ -15,13 +17,13 @@ Submit indexer job
 This call creates the Salmon index files. 
 """
 # Open a pipe to the qsub command.
-proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+proc = Popen('qsub', shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
 
 # Customize your options here
-job_name = "indexer_test"
+job_name = "single_run_test"
 walltime = "1:00:00"
 processors = "nodes=1:ppn=1"
-command = "python indexer.py"
+command = "python single_quantifier.py -l SAMN07372049,SRR8239475"
 
 job_string ="""#!/bin/bash -l
 #PBS -q default
@@ -39,6 +41,9 @@ module load python/anaconda3
 
 module load salmon
 
+module load sratoolkit
+
+
 %s
 
 exit 0
@@ -50,3 +55,5 @@ exit 0
 proc.stdin.write(job_string.encode('utf-8'))
 
 print(proc.communicate())
+
+time.sleep(0.1)

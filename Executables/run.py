@@ -73,13 +73,13 @@ This call creates the Salmon index files.
 proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
 
 # Customize your options here
-job_name = "my_job_indexer"
+job_name = "indexer"
 walltime = "1:00:00"
 processors = "nodes=1:ppn=1"
 command = "python indexer.py"
 
 job_string = """#!/bin/bash
-#PBS -q tyestq
+#PBS -q largeq
 #PBS -A NCCCsub 
 #PBS -N %s
 #PBS -l walltime=%s
@@ -110,37 +110,35 @@ time.sleep(0.1)
     
 """
 Start submitting jobs that call quantifier script once the indexer job is done. 
-
-Should hold job until indexer job is finished. I have no idea if this works though. 
 """
-for i in bio_sample_dic.keys()[600:601]:
+for i in list(bio_sample_dic.keys()):
     # Open a pipe to the qsub command.
-    proc = Popen('qsub -hold_jid my_job_indexer', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    proc = Popen('qsub -hold_jid "indexer*"', shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
     
     # Customize your options here
-    job_name = "my_job_%d" % i
-    walltime = "1:00:00"
+    job_name = "single_quant_%s" % bio_sample_dic[i]
+    walltime = "01:00:00"
     processors = "nodes=1:ppn=1"
-    command = "python quantifier.py -l "+i+","+bio_sample_dic[i]
+    command = "python single_quantifier.py -l "+i+","+bio_sample_dic[i]
 
     job_string = """#!/bin/bash
-    #PBS -q tyestq
-    #PBS -A NCCCsub 
-    #PBS -N %s
+    #PBS -q largeq
+    #PBS -N %s 
     #PBS -l walltime=%s
     #PBS -l %s
-    #PBS -l feature='cellf'
-    #PBS -m bea
-    #PBS -M jacob.d.holt.gr@dartmouth.edu
-    #PBS -o ./output/%s.out
-    #PBS -e ./error/%s.err
+    #PBS -l mem=2gb
     
-    cd $PBS_O_WORKDIR
-    
+    cd "/dartfs-hpc/rc/home/5/f004ky5/sraProcessingPipeline"
+
+    module load python/anaconda3
+
+    module load salmon
+
     module load sratoolkit
     
-    module load Salmon
-    %s""" % (job_name, walltime, processors, job_name, job_name, command)
+    %s
+    
+    """ % (job_name, walltime, processors, command)
     
     # Send job_string to qsub
     #if (sys.version_info > (3, 0)):
@@ -153,11 +151,48 @@ for i in bio_sample_dic.keys()[600:601]:
     print(job_string)
     print(out)
     
-    time.sleep(0.1)
-    
-    #something to move quants out of scratch should be here
+    time.sleep(1)
     
 """
-CSV Builder Call
-It's easier to run this locally I think? 
+CSV Builder Job submit
 """
+# Open a pipe to the qsub command.
+proc = Popen('qsub -hold_jid "quant*"', shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+
+# Customize your options here
+job_name = "csv_builder"
+walltime = "00:20:00"
+processors = "nodes=1:ppn=1"
+command = "csv_builder.py "
+
+job_string = """#!/bin/bash
+#PBS -q largeq
+#PBS -N %s 
+#PBS -l walltime=%s
+#PBS -l %s
+#PBS -l mem=2gb
+
+cd "/dartfs-hpc/rc/home/5/f004ky5/sraProcessingPipeline"
+
+module load python/anaconda3
+
+module load salmon
+
+module load sratoolkit
+
+%s
+
+""" % (job_name, walltime, processors, command)
+
+# Send job_string to qsub
+#if (sys.version_info > (3, 0)):
+proc.stdin.write(job_string.encode('utf-8'))
+
+#proc.stdin.write(job_string)
+out, err = proc.communicate()
+
+# Print your job and the system response to the screen as it's submitted
+print(job_string)
+print(out)
+
+time.sleep(0.1)

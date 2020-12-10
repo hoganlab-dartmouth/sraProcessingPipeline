@@ -15,7 +15,7 @@ Directories
 this should be an input tbh
 """
 #ref folder name, ref genomes go here
-ref_folder = '~/sraProcessingPipeline/References'
+ref_folder = 'References'
 
 """
 Silly function
