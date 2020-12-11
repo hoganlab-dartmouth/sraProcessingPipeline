@@ -1,0 +1,16 @@
+#!/bin/bash -l
+#PBS -q largeq
+#PBS -N indexer
+#PBS -l walltime=00:30:00
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=2gb
+
+cd "/dartfs-hpc/rc/home/5/f004ky5/sraProcessingPipeline"
+
+module load python/anaconda3
+
+module load salmon
+
+python indexer.py
+
+exit 0

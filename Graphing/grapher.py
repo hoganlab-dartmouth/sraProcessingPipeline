@@ -124,10 +124,6 @@ df1[['s_a','s_b','s_wt', 's_wt_b']]=salmon[['a','b','wt','wt_b']]
 df = pd.concat([df2, df1], axis=1)
 df = df.dropna()
 
-#clean up memory
-del df2
-del df1
-
 #%%%
 """
 Quick scatter plot of Salmon vs CLC indexed by PA14 gene id
@@ -142,12 +138,60 @@ plt.plot(x,y, color='red', linestyle='dashed')
 
 
 
-plt.xlabel('CLC')
-plt.ylabel('Residual Squared')
+plt.xlabel('CLC Log10(TPM)')
+plt.ylabel('Salmon Log10(TPM)')
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.title(file_name+', No Bias Correction')
 plt.show()
 
+#%%%
+"""
+Quick scatter plot comparing forward and reverse reads
+"""
+
+#load in reverse reads, reverse reads are R1 in the tester_data
+file_name2 = "PA14_K31_Unpaired"
+salmon_r = pd.read_csv (file_name+'.csv')
+
+#rename genes as PA14 and make it so row names are column names
+seq_id_to_gene_id_pa14 = dict_gene_num_to_ids("PA14.gz")
+salmon_r.rename(mapper=seq_id_to_gene_id_pa14, axis="columns", inplace=True)
+salmon_r = salmon_r.transpose()
+new_header = salmon_r.iloc[0]
+salmon_r = salmon_r[1:] 
+salmon_r.columns_r = new_header
+salmon_r.columns=['a','wt','b','wt_b']
+
+
+
+#add 1 to all points in dataset before taking log10
+salmon_r = salmon_r+1
+for i in list(salmon_r.columns.values):
+    salmon_r[i] = pd.to_numeric(salmon_r[i], downcast="float")
+salmon_r = np.log10(salmon_r)
+
+#this is really ugly but we're gonna rename columns by making new dataframes
+salmon_r2=pd.DataFrame()
+salmon_r2[['mut_rep1_r','mut_rep2_r','wt_rep1_r','wt_rep2_r']]=salmon_r[['a','b','wt','wt_b']]
+salmon_f=pd.DataFrame()
+salmon_f[['mut_rep1_f','mut_rep2_f','wt_rep1_f','wt_rep2_f']]=salmon[['a','b','wt','wt_b']]
+
+f_and_r = pd.concat([salmon_r2, salmon_f], axis=1)
+
+#make the scatters
+for i in np.arange(0,len(list(salmon_r2.columns.values))):
+    plt.scatter(f_and_r[list(salmon_r2.columns.values)[i]],f_and_r[list(salmon_f.columns.values)[i]], alpha=0.5, label=list(salmon_r2.columns.values)[i][:-2])
+x = np.linspace(0,5)
+y = x
+plt.plot(x,y, color='red', linestyle='dashed')
+
+
+
+plt.xlabel(file_name2+', Log10(TPM)')
+plt.ylabel(file_name+', Log10(TPM)')
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.title('Salmon, No Bias Correction')
+plt.show()
 #%%
 """
 Residual Squared plot with RMSD
@@ -245,6 +289,7 @@ plt.xlabel('Genes')
 plt.ylabel('Log10(TPM)')
 plt.title(file_name+', No Bias Correction, Sorted by: '+metric)
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
 
 #%%
 """
@@ -265,6 +310,7 @@ plt.xlabel('Genes')
 plt.ylabel('Log10(TPM)')
 plt.title(file_name+', No Bias Correction, Sorted by: '+metric)
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
 
 #%%
 """
@@ -290,6 +336,7 @@ plt.xlabel('Genes')
 plt.ylabel('Log10(TPM)')
 plt.title(file_name+', No Bias Correction, Pho Genes sorted by: '+metric)
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
     
 #%%
 """
